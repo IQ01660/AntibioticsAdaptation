@@ -3,7 +3,7 @@ import java.awt.Graphics;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-/*
+/**
  * This method will control the animation
  * as well as call the add mouse event listener
  */
@@ -14,6 +14,7 @@ public class Main extends JPanel implements WindowInfo
 	
 	public static void main(String[] args) 
 	{
+		Vector a = new Vector(5,3);
 		JFrame simulationFrame = new JFrame("Antibiotics Simulation");
 		simulationFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		simulationFrame.setContentPane(new Main());
