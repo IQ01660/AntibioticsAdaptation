@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 
@@ -9,6 +10,7 @@ import javax.swing.JPanel;
  */
 public class Main extends JPanel implements WindowInfo
 {
+	
 	//static and final fields
 	private static final int FPS = 60;
 	
@@ -20,17 +22,27 @@ public class Main extends JPanel implements WindowInfo
 		simulationFrame.setContentPane(new Main());
 		simulationFrame.pack();
 		simulationFrame.setVisible(true);
+		
 	}
 	public Main() 
 	{
 		this.setPreferredSize(new Dimension(WindowInfo.WINDOW_WIDTH, WindowInfo.WINDOW_HEIGHT));
 		Thread genSimulationTimeline = new Thread(new SimulationRunner());
 		genSimulationTimeline.start();
+		Evolution.randomlyPopulate();
 	}
 	@Override
 	public void paintComponent(Graphics g)
 	{
+		super.paintComponent(g);
+		//back
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, WindowInfo.WINDOW_WIDTH, WindowInfo.WINDOW_HEIGHT);
 		//animation drawing
+
+		Evolution.drawAllBacteria(g);
+		Evolution.drawAllAntibiotics(g);
+		
 	}
 	class SimulationRunner implements Runnable
 	{
@@ -41,11 +53,13 @@ public class Main extends JPanel implements WindowInfo
 			// TODO Auto-generated method stub
 			while(true) 
 			{
-				//repeting animation
+				Evolution.disappearAllConsumed();
+				System.out.println(Evolution.findAverageFitness());
+				//repeating animation
 				repaint();
 				try 
 				{
-					Thread.sleep(1000/FPS);
+					Thread.sleep(1000/60);
 				}
 				catch(Exception e)
 				{

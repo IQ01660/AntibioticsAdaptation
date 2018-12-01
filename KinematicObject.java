@@ -23,24 +23,36 @@ public abstract class KinematicObject implements WindowInfo
 		if(isBeyondX()) 
 		{
 			this.velocity.x = -1 * this.velocity.x;
+			if(this.position.x < WindowInfo.WINDOW_WIDTH/2) {
+				this.position.x = this.radius + 10;
+			}
+			else {
+				this.position.x = WindowInfo.WINDOW_WIDTH - this.radius - 10;
+			}
 		}
-		else if(isBeyondY())
+		if(isBeyondY())
 		{
 			this.velocity.y = -1 * this.velocity.y;
+			if(this.position.y < 350) {
+				this.position.y = this.radius + 10;
+			}
+			else {
+				this.position.y = WindowInfo.WINDOW_HEIGHT - this.radius - 10;
+			}
 		}
 	}
 	//checks if the object goes beyond the left or right of the screen
 	private boolean isBeyondX()
 	{
-		if (this.position.x - this.radius < 0){return true;}
-		else if (this.position.x + this.radius > WindowInfo.WINDOW_WIDTH) {return true;}
+		if (this.position.x - this.radius <= 10){return true;}
+		else if (this.position.x + this.radius >= WindowInfo.WINDOW_WIDTH - 10) {return true;}
 		else {return false;}
 	}
 	//checks if the object goes beyond the top or bottom of the screen
 	private boolean isBeyondY()
 	{
-		if (this.position.y - this.radius < 0){return true;}
-		else if (this.position.y + this.radius > WindowInfo.WINDOW_HEIGHT) {return true;}
+		if (this.position.y - this.radius <= 10){return true;}
+		else if (this.position.y + this.radius >= WindowInfo.WINDOW_HEIGHT - 10) {return true;}
 		else {return false;}
 	}
 }
