@@ -22,21 +22,28 @@ public class Main extends JPanel implements WindowInfo
 		simulationFrame.setContentPane(new Main());
 		simulationFrame.pack();
 		simulationFrame.setVisible(true);
-		
 	}
+	
+	public void addNotify() {
+        super.addNotify();
+        requestFocus();
+    }
+	
 	public Main() 
 	{
 		this.setPreferredSize(new Dimension(WindowInfo.WINDOW_WIDTH, WindowInfo.WINDOW_HEIGHT));
 		Thread genSimulationTimeline = new Thread(new SimulationRunner());
 		genSimulationTimeline.start();
 		Evolution.randomlyPopulate();
+		this.addKeyListener(Evolution.antibioPopulation.peek());
+		this.addMouseListener(Evolution.antibioPopulation.peek());
 	}
 	@Override
 	public void paintComponent(Graphics g)
 	{
 		super.paintComponent(g);
 		//back
-		g.setColor(Color.BLACK);
+		g.setColor(new Color(253, 255, 163));
 		g.fillRect(0, 0, WindowInfo.WINDOW_WIDTH, WindowInfo.WINDOW_HEIGHT);
 		//animation drawing
 
@@ -59,7 +66,7 @@ public class Main extends JPanel implements WindowInfo
 				repaint();
 				try 
 				{
-					Thread.sleep(1000/60);
+					Thread.sleep(1000/FPS);
 				}
 				catch(Exception e)
 				{
