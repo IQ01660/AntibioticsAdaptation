@@ -3,16 +3,20 @@ import java.awt.Graphics;
 
 /**
  * This class is a "phenotype", namely it describes the object that will store the
- * "genotype", which is desribed in DNA
+ * "genotype", which is described in DNA
  * @author ikramgabiyev
  *
  */
-
 public class Bacterium extends KinematicObject implements Consumable, WindowInfo
 {
-	public static final double BAC_RADIUS = 5; // the radius of all bacteria
-	public static final double UNIVERSAL_COEF = -5000; // used to calculate repulsion force ( see changeAcceleration() )
-	public static final int OFFSET = 20; // an offset used to pose some limit to where bacteria can emerge
+	// the radius of all bacteria
+	public static final double BAC_RADIUS = 5; 
+	// used to calculate repulsion force and acceleration( see changeAcceleration() )
+	public static final double UNIVERSAL_COEF = -5000; 
+	// an offset used to pose some limit to where bacteria can emerge
+	public static final int OFFSET = 20; 
+	// the speed of the bacterium used in calculations
+	public static final double MAX_SPEED = 10; 
 	
 	public Color bacColor; // the color of the Bacterium
 	public DNA genome; // stores properties which will be sent to the next generation
@@ -26,7 +30,7 @@ public class Bacterium extends KinematicObject implements Consumable, WindowInfo
 	 */
 	
 	private void setBacteriumParameters() {
-		this.lifeTime = 0;
+		this.lifeTime = 0;//this lifetime will increase over time [see dawBacteria(Graphics g)] 
 		this.radius = BAC_RADIUS;
 		this.mass = this.genome.dna_mass;
 		this.velocity = this.genome.initVelocity;
@@ -67,11 +71,23 @@ public class Bacterium extends KinematicObject implements Consumable, WindowInfo
 	
 	public boolean isIn() 
 	{
+		/*
+		 * CHECK IF YOU ARE CONSUMED BY VIRUS 
+		 */
+		if(Vector.getDistance(this.position, Evolution.hiv.position) <= (Evolution.hiv.radius))
+		{
+			Evolution.hiv.eat();
+			return true;
+		}
+		/*
+		 * CHECK IF YOU ARE CONSUMED BY ONE OF THE ANTIBIOTICS
+		 */
 		BiologicalNode<Antibiotic> tempTail = Evolution.antibioPopulation.tail;
 		for (int i = Evolution.antibioPopulation.length - 1; i >= 0; i--)
 		{
 			if( Vector.getDistance(this.position, tempTail.bioElem.position) <= (tempTail.bioElem.radius) )
 			{
+				tempTail.bioElem.eat();
 				return true;
 			}
 			tempTail = tempTail.nextBioNode;
@@ -108,19 +124,46 @@ public class Bacterium extends KinematicObject implements Consumable, WindowInfo
 	
 	public void changeAcceleration()
 	{
-		Antibiotic closestAnti = Evolution.antibioPopulation.peek();
+		/*
+		 * FINDING THE ANTIBIOTIC
+		 * CLOSEST TO THE BACTERIUM
+		 */
+		Antibiotic closestAnti = Evolution.antibioPopulation.peek(); // this could change if it is not closest
+		double closestDistanceToAnti = WindowInfo.WINDOW_WIDTH; // just picking a large distance
+		BiologicalNode<Antibiotic> tempTail = Evolution.antibioPopulation.tail;
+		for(int i = 0; i < Evolution.antibioPopulation.length; i++)
+		{
+			if(Vector.getDistance(this.position, tempTail.bioElem.position) < closestDistanceToAnti)
+			{
+				closestDistanceToAnti = Vector.getDistance(this.position, tempTail.bioElem.position);
+				closestAnti = tempTail.bioElem;
+			}
+			tempTail = tempTail.nextBioNode;
+		}
 		
-		if(Math.abs((closestAnti.position.x-this.position.x)) < closestAnti.radius + 20) {
+		/*
+		 * CHANGES ACCELERATION IF THE BACTERIUM IS TOO CLOSE 
+		 * TO THE ANTIBIOTIC
+		 */
+		if(Math.abs((closestAnti.position.x-this.position.x)) < closestAnti.radius + (closestAnti.radius * 0.2)) {
 			
 			double accelerationX = UNIVERSAL_COEF * this.genome.getRepulsionCoef()/((closestAnti.position.x-this.position.x)*this.mass);
 			double accelerationY = UNIVERSAL_COEF * this.genome.getRepulsionCoef()/((closestAnti.position.y-this.position.y)*this.mass);
 			this.acceleration = new Vector(accelerationX, accelerationY);
 		}
+		
+		/*
+		 * STABILIZES THE VELOCITY SO THAT IT DOES NOT EXCEED CERTAIN THRESHOLD
+		 */
 		if(this.velocity.magnitude > DNA.maxComponentSpeed*1.41) {
-			this.velocity.x = (10/this.velocity.magnitude)*this.velocity.x;
-			this.velocity.y = (10/this.velocity.magnitude)*this.velocity.y;
+			this.velocity.x = (MAX_SPEED/this.velocity.magnitude)*this.velocity.x;
+			this.velocity.y = (MAX_SPEED/this.velocity.magnitude)*this.velocity.y;
 		}
-		if(Math.abs((closestAnti.position.x-this.position.x)) > closestAnti.radius + 50) {
+		
+		/*
+		 * MAKES ACCELERATION 0 AFTER BACTERIUM LEAVES THE DANGER ZONE
+		 */
+		if(Math.abs((closestAnti.position.x-this.position.x)) > closestAnti.radius + (closestAnti.radius * 0.5)) {
 			this.acceleration = new Vector(0, 0);
 		}
 		
@@ -138,9 +181,8 @@ public class Bacterium extends KinematicObject implements Consumable, WindowInfo
 	public void drawBacteria(Graphics g)
 	{
 		this.changeAcceleration();
-		this.lifeTime++;
-		Evolution.bacteriaPopulation.lifeTimeSum++;
-		System.out.println(Evolution.findAverageFitness());
+		this.lifeTime++; // the life of the single bacteria is increased
+		Evolution.bacteriaPopulation.lifeTimeSum++; // the sum of lives is increased
 		this.piePiece = this.lifeTime / Evolution.bacteriaPopulation.lifeTimeSum;
 		g.setColor(bacColor);
 		g.fillOval((int)(this.position.x - this.radius), (int)(this.position.y - this.radius), (int)(2*this.radius), (int)(2*this.radius));

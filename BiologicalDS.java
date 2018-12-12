@@ -78,11 +78,17 @@ public class BiologicalDS<E extends KinematicObject>
 	
 	public void remove(E _bioElem) {
 		// TODO Auto-generated method stub
+		
+		// first check if the element to remove
+		// is the tail itself, and use pop() for it
 		BiologicalNode<E> tempTail = this.tail;
 		if (tempTail.bioElem == _bioElem) {
 			this.pop();
 			return;
 		}
+		
+		// else go through every element
+		// and remove the necessary one
 		else {
 			for(int i = length - 1; i >= 0; i--) {
 				if (tempTail.nextBioNode.bioElem != _bioElem) {
