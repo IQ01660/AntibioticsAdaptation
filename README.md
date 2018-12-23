@@ -6,11 +6,11 @@ Antibiotics have a lifeTime which decreases if they do not eat enough
 
 The bacteria use genetic algorithm to evolve over time and evade the antibiotic class
 
-The player's goal is to controlling the virus using mouse, try to evade antibiotics,
+The player's goal is to control the virus using mouse, and try to evade antibiotics,
 
 and at the same time eat as many bacteria as possible trying to slow down their evolution
 
-because of antibiotics die the game will be over, and the score of the virus will be store
+once antibiotics die the game will be over, and the score of the virus will be stored
 
 Note: if its the best score it will be stored in a file and displayed on the screen
 
