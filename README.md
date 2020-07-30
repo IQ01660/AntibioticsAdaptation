@@ -1,3 +1,7 @@
+# AntibioticsAdaptation
+This program uses a genetic algorithm to show how bacteria adapt to antibiotics over time
+
+## Simulation Rules
 This is a game of 3 biological elements: antibiotics, bacteria, and a virus
 
 Antibiotics can eat bacteria and the virus while the virus can eat bacteria.
